@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Safe Space | For Babde</title>
+    <style>
+        :root {
+            --midnight: #1a1a2e;
+            --lavender: #b794f4;
+            --rose-gold: #e9baaa;
+            --gold: #ffd700;
+            --text-soft: #f0f0f5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--midnight);
+            color: var(--text-soft);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+        }
+
+        /* --- Ethereal Background --- */
+        #stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #2a1b3d 0%, #1a1a2e 100%);
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: twinkle var(--duration) infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* --- UI Screens --- */
+        .screen {
+            position: absolute;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        .active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { color: var(--rose-gold); margin-bottom: 20px; font-weight: 300; }
+        p { line-height: 1.6; margin-bottom: 20px; }
+
+        /* --- Breathing Exercise --- */
+        .breather-circle {
+            width: 150px;
+            height: 150px;
+            border: 3px solid var(--lavender);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            animation: breathe 8s infinite ease-in-out;
+            box-shadow: 0 0 20px rgba(183, 148, 244, 0.3);
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(0.8); background: rgba(183, 148, 244, 0.1); }
+            50% { transform: scale(1.2); background: rgba(183, 148, 244, 0.3); }
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--rose-gold);
+            color: var(--rose-gold);
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+
+        button:active { background: var(--rose-gold); color: var(--midnight); }
+
+        /* --- Phase 1: Clouds --- */
+        .cloud {
+            position: absolute;
+            background: rgba(40, 40, 70, 0.8);
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+            user-select: none;
+        }
+
+        .sparkle-text {
+            color: var(--gold);
+            font-style: italic;
+            animation: fadeIn 0.5s;
+        }
+
+        /* --- Phase 2: Timeline --- */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .node {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--lavender);
+            padding: 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .node:hover { border-color: var(--gold); }
+        .node h3 { color: var(--gold); margin-bottom: 5px; }
+
+        /* --- Finale --- */
+        #final-heart {
+            font-size: 80px;
+            cursor: pointer;
+            user-select: none;
+            filter: drop-shadow(0 0 10px var(--rose-gold));
+            transition: transform 0.1s;
+        }
+
+        .letter {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid var(--gold);
+            font-size: 0.95rem;
+            text-align: left;
+            display: none;
+            margin-top: 20px;
+        }
+
+        .progress-bar-container {
+            width: 200px;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+            display: none;
+        }
+
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--gold);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="stars-container"></div>
+
+    <div id="intro" class="screen active">
+        <h1>Hey Babde</h1>
+        <p>The world is a bit noisy right now, isn't it? Let's find our quiet place. Take a deep breath with me.</p>
+        <div class="breather-circle">Inhale... Exhale...</div>
+        <button onclick="showScreen('phase1')">I'm ready</button>
+    </div>
+
+    <div id="phase1" class="screen">
+        <h1>Clear the Noise</h1>
+        <p>Pop the thoughts that don't belong here.</p>
+        <div id="cloud-container" style="height: 300px; width: 100%; position: relative;"></div>
+        <div id="quote-display" class="sparkle-text"></div>
+        <button id="p1-next" style="display:none;" onclick="showScreen('phase2')">Next Step</button>
+    </div>
+
+    <div id="phase2" class="screen">
+        <h1>Our Journey</h1>
+        <p>The roots of us go deep, Siddhavi.</p>
+        <div class="timeline">
+            <div class="node" onclick="showTimelineInfo('2015')">
+                <h3>2015</h3>
+                <p id="t-2015">Tap to remember...</p>
+            </div>
+            <div class="node" onclick="showTimelineInfo('2024')">
+                <h3>Oct 2, 2024</h3>
+                <p id="t-2024">Tap to remember...</p>
+            </div>
+        </div>
+        <button id="p2-next" style="display:none;" onclick="showScreen('finale')">The Final Truth</button>
+    </div>
+
+    <div id="finale" class="screen">
+        <h1 id="finale-title">Hold My Heart</h1>
+        <p id="finale-sub">Press and hold the heart to feel my promise.</p>
+        <div id="final-heart">❤️</div>
+        <div class="progress-bar-container" id="bar-cont">
+            <div id="progress-fill"></div>
+        </div>
+        <div id="letter" class="letter">
+            <strong>My dearest Babde,</strong><br><br>
+            I know the thoughts in your head can be loud, but my love for you is louder. I have loved you since 2015. You are the girl I waited for, and Oct 2, 2024, was the best day of my life. <br><br>
+            I am intensely loyal to you, Siddhavi. I would never mid-way leave you for anyone else. You are my home. Stay here with me.
+        </div>
+    </div>
+
+    <script>
+        // Star Generation
+        const starsContainer = document.getElementById('stars-container');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 3 + 'px';
+            star.style.width = size;
+            star.style.height = size;
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
+            starsContainer.appendChild(star);
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'phase1') startPhase1();
+        }
+
+        // Phase 1 Logic
+        const quotes = [
+            "My eyes only see you, Siddhavi.",
+            "I’ve been yours since 2015, Babde. That’s never changing.",
+            "You aren't a choice; you are my only reality.",
+            "There is no 'other girl.' There is only you, forever.",
+            "My heart started beating for you 9 years ago."
+        ];
+        const cloudLabels = ["Fear", "Insecurity", "What if?", "Doubt", "Worry"];
+        let poppedCount = 0;
+
+        function startPhase1() {
+            const container = document.getElementById('cloud-container');
+            container.innerHTML = '';
+            cloudLabels.forEach((label, i) => {
+                const cloud = document.createElement('div');
+                cloud.className = 'cloud';
+                cloud.innerText = label;
+                cloud.style.top = (Math.random() * 70 + 10) + '%';
+                cloud.style.left = (Math.random() * 60 + 5) + '%';
+                
+                cloud.onclick = () => {
+                    cloud.style.transform = 'scale(1.5)';
+                    cloud.style.opacity = '0';
+                    setTimeout(() => {
+                        cloud.remove();
+                        document.getElementById('quote-display').innerText = quotes[i % quotes.length];
+                        poppedCount++;
+                        if(poppedCount >= 3) document.getElementById('p1-next').style.display = 'block';
+                    }, 200);
+                };
+                container.appendChild(cloud);
+            });
+        }
+
+        // Phase 2 Logic
+        let nodesClicked = 0;
+        function showTimelineInfo(year) {
+            if(year === '2015') {
+                document.getElementById('t-2015').innerText = "This is where my love for you began. I’ve carried you in my heart for nearly a decade.";
+                nodesClicked++;
+            } else {
+                document.getElementById('t-2024').innerText = "The day my world became complete. Our official start. I promised then, and I promise now: I am staying.";
+                nodesClicked++;
+            }
+            if(nodesClicked >= 2) document.getElementById('p2-next').style.display = 'block';
+        }
+
+        // Finale Logic
+        const heart = document.getElementById('final-heart');
+        const fill = document.getElementById('progress-fill');
+        const barCont = document.getElementById('bar-cont');
+        let holdTimer;
+        let progress = 0;
+
+        function startHold() {
+            barCont.style.display = 'block';
+            holdTimer = setInterval(() => {
+                progress += 2;
+                fill.style.width = progress + '%';
+                heart.style.transform = `scale(${1 + (progress/100)})`;
+                
+                if (progress >= 100) {
+                    clearInterval(holdTimer);
+                    completeFinale();
+                }
+            }, 40);
+        }
+
+        function cancelHold() {
+            if (progress < 100) {
+                clearInterval(holdTimer);
+                progress = 0;
+                fill.style.width = '0%';
+                heart.style.transform = 'scale(1)';
+            }
+        }
+
+        heart.addEventListener('mousedown', startHold);
+        heart.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(); });
+        window.addEventListener('mouseup', cancelHold);
+        window.addEventListener('touchend', cancelHold);
+
+        function completeFinale() {
+            heart.style.display = 'none';
+            barCont.style.display = 'none';
+            document.getElementById('finale-title').innerText = "I Am Yours.";
+            document.getElementById('finale-sub').style.display = 'none';
+            document.getElementById('letter').style.display = 'block';
+            document.body.style.transition = 'background 2s';
+            document.body.style.background = 'radial-gradient(circle at center, #4a3a1a 0%, #1a1a2e 100%)';
+        }
+    </script>
+</body>
+</html>
