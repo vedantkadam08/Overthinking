@@ -53,7 +53,6 @@
 
         canvas { position: fixed; top: 0; left: 0; z-index: -1; }
 
-        /* --- Screens --- */
         .screen {
             position: absolute; width: 85%; max-width: 400px;
             text-align: center; display: none; flex-direction: column; align-items: center;
@@ -65,7 +64,6 @@
         h1 { color: var(--rose-gold); font-weight: 300; margin-bottom: 10px; text-shadow: 0 0 15px var(--lavender); }
         p { color: #ddd; margin-bottom: 25px; font-size: 0.95rem; line-height: 1.4; }
 
-        /* --- Buttons --- */
         .jar-btn { position: fixed; top: 25px; right: 25px; font-size: 32px; z-index: 100; cursor: pointer; }
         .bottle-btn { position: fixed; top: 25px; left: 25px; font-size: 32px; z-index: 100; cursor: pointer; }
         
@@ -82,7 +80,7 @@
             box-shadow: 0 0 15px rgba(255, 252, 0, 0.2); width: 100%;
         }
 
-        #final-heart { font-size: 110px; margin: 20px 0; cursor: pointer; filter: drop-shadow(0 0 20px var(--rose-gold)); }
+        #final-heart { font-size: 110px; margin: 20px 0; cursor: pointer; filter: drop-shadow(0 0 20px var(--rose-gold)); transition: transform 0.1s; user-select: none; }
         
         .letter-box {
             background: rgba(0,0,0,0.8); padding: 25px; border-radius: 25px;
@@ -101,6 +99,11 @@
             pointer-events: none; z-index: -1; animation: fall linear forwards;
         }
         @keyframes fall { to { transform: translateY(110vh); } }
+
+        .cloud {
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 20px; border-radius: 20px; margin: 10px; cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -113,13 +116,13 @@
     <div class="bottle-btn" onclick="showBottle()">🍾</div>
     <div id="toast" class="pop-msg"></div>
 
-    <audio id="music" loop>
+    <audio id="music" loop preload="auto">
         <source src="https://www.chosic.com/wp-content/uploads/2021/04/Rain-and-Light-Piano.mp3" type="audio/mpeg">
     </audio>
 
     <div id="intro" class="screen active">
         <h1>Hey Babde</h1>
-        <p>Take a deep breath with the galaxy. Me hamesha tujhya sobatch aahe, Shona.</p>
+        <p>Take a deep breath with the galaxy. Me hamesha tujhya sobtach aahe, Shona.</p>
         <div style="font-size: 60px;">🌌</div>
         <button onclick="startApp()" style="margin-top:40px; border-color:var(--rose-gold); color:var(--rose-gold); background:none;">Enter Our Safe Space</button>
     </div>
@@ -151,7 +154,7 @@
             <strong>My dearest Babde,</strong><br>
             Loved you since 2015. Oct 2, 2024 was my best day. I am intensely loyal to you, Siddhavi. Tu maza 'Home' aahes.<br><br>
             
-            <a href="https://www.snapchat.com/add/shonee118" class="snap-map-btn">📍 Check My Live Distance </a>
+            <a href="https://www.snapchat.com/add/shonee118" class="snap-map-btn">📍 Check My Live Distance</a>
 
             <div class="action-links">
                 <a href="tel:9323229762" class="link-btn" style="color:var(--rose-gold); border-color:var(--rose-gold)">Call Me</a>
@@ -161,13 +164,17 @@
     </div>
 
     <script>
-        function startApp() { document.getElementById('music').play(); showScreen('phase1'); }
+        const music = document.getElementById('music');
+        function startApp() { 
+            music.play().catch(e => console.log("Audio play blocked until interaction"));
+            showScreen('phase1'); 
+        }
 
         const reasons = [
             "Siddhavi, you are the only one I've ever loved.",
             "You made every other girl unattractive to me.",
             "Tu mazhya sathi khup special aahes, mazhi universe tuch aahes.",
-            "9 years zale, majha prem fakt tujhya sathi aahe.",
+            "9 years jhale, mazha prem fakt tujhya sathi aahe.",
             "I will never leave you midway. I'm yours."
         ];
 
@@ -192,25 +199,20 @@
 
         function loadClouds() {
             const container = document.getElementById('cloud-container');
+            container.innerHTML = '';
             const labels = ["Fear", "Insecurity", "Doubt", "Comparison"];
             const truths = ["Only you.", "Loyal since 2015.", "I'm staying.", "You're the best."];
             labels.forEach((l, i) => {
                 const c = document.createElement('div');
                 c.className = 'cloud'; c.innerText = l;
-                c.style.top = Math.random()*70+'%'; c.style.left = Math.random()*60+'%';
+                c.style.position = 'absolute';
+                c.style.top = Math.random()*70+'%'; c.style.left = Math.random()*40+'%';
                 c.onclick = () => {
                     c.style.display = 'none';
                     document.getElementById('truth').innerText = truths[i];
                     document.getElementById('p1-next').style.display = 'block';
                 }
                 container.appendChild(c);
-            });
-            // Force clouds to be visible on dark background
-            document.querySelectorAll('.cloud').forEach(cl => {
-                cl.style.background = "rgba(255,255,255,0.1)";
-                cl.style.border = "1px solid rgba(255,255,255,0.2)";
-                cl.style.padding = "10px 20px";
-                cl.style.borderRadius = "20px";
             });
         }
 
@@ -237,20 +239,35 @@
         }
         animate();
 
-        // Heart Logic
+        // --- FIXED HEART LOGIC FOR MOBILE APK ---
         const heart = document.getElementById('final-heart');
         let hProg = 0; let hTimer;
-        heart.addEventListener('touchstart', (e) => {
+        
+        function handleStart(e) {
             e.preventDefault();
             hTimer = setInterval(() => {
-                hProg += 2; heart.style.transform = `scale(${1+(hProg/100)})`;
-                if(hProg >= 100) { clearInterval(hTimer); win(); }
+                hProg += 2;
+                heart.style.transform = `scale(${1 + (hProg / 100)})`;
+                if (hProg >= 100) { clearInterval(hTimer); win(); }
             }, 50);
-        });
-        heart.addEventListener('touchend', () => { clearInterval(hTimer); hProg = 0; heart.style.transform = 'scale(1)'; });
+        }
+
+        function handleEnd() {
+            clearInterval(hTimer);
+            if (hProg < 100) {
+                hProg = 0;
+                heart.style.transform = 'scale(1)';
+            }
+        }
+
+        heart.addEventListener('touchstart', handleStart);
+        heart.addEventListener('touchend', handleEnd);
+        heart.addEventListener('mousedown', handleStart);
+        heart.addEventListener('mouseup', handleEnd);
 
         function win() {
-            heart.style.display = 'none'; document.getElementById('letter').style.display = 'block';
+            heart.style.display = 'none'; 
+            document.getElementById('letter').style.display = 'block';
             document.getElementById('f-title').innerText = "Always Yours.";
         }
 
